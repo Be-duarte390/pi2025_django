@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Chamadas</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <style>
+        :root {
+            --cinza-fundo: #f2f2f2;
+            --cinza-caixa: #e0e0e0;
+            --cinza-texto: #222;
+            --cinza-pisca: #f2f2f2;
+            --azul: #0a2e73;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cinza-fundo);
+            color: var(--cinza-texto);
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10vh;
+            background-color: var(--cinza-caixa);
+            color: var(--azul);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            font-size: 1.6rem;
+            z-index: 10;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .container {
+            position: fixed;
+            top: 10vh;
+            left: 0;
+            width: 100%;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            background-color: var(--cinza-fundo);
+            overflow: hidden;
+        }
+
+        .senha-atual {
+            margin-top: 40px;
+            background-color: var(--cinza-caixa);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .piscar {
+            animation: blink 1.5s infinite;
+        }
+
+        .senha-chamada {
+            font-size: 4.8rem;
+            font-weight: bold;
+            color: var(--cinza-texto);
+            margin-bottom: 20px;
+        }
+
+        .guiche {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--cinza-texto);
+        }
+
+        .historico {
+            background-color: #ffffffcc;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            width: 80%;
+        }
+
+        .historico h3 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: var(--azul);
+            text-align: center;
+        }
+
+        .historico ul {
+            font-size: 1.8rem;
+            list-style: none;
+            padding-left: 0;
+            line-height: 2.8rem;
+            text-align: center;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5vh;
+            background-color: #dee2e6;
+            color: #555;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                color: var(--cinza-texto);
+                background-color: transparent;
+            }
+            50% {
+                color: var(--cinza-pisca);
+                background-color: var(--cinza-texto);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{% static 'Imagens/logo.png' %}" alt="Logo Instituto Lauro de Souza Lima" class="logo">
+        <div id="relogio"></div>
+    </div>
+
+    <div class="container fade-in">
+        <div class="senha-atual">
+            <div class="senha-chamada piscar">Senha: <span id="senha">G012</span></div>
+            <div class="guiche piscar">Guichê: <span id="guiche">04</span></div>
+        </div>
+
+        <div class="historico">
+            <h3>Últimas Chamadas</h3>
+            <ul id="historico">
+                <li>G011 - Guichê 02</li>
+                <li>U003 - Guichê 01</li>
+                <li>E005 - Guichê 05</li>
+                <li>C019 - Guichê 03</li>
+                <li>P004 - Guichê 01</li>
+                <li>G010 - Guichê 04</li>
+                <li>U008 - Guichê 02</li>
+                <li>E004 - Guichê 05</li>
+                <li>C012 - Guichê 03</li>
+                <li>P006 - Guichê 01</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 Instituto Lauro de Souza Lima. Todos os direitos reservados.
+    </div>
+
+    <audio id="som-alerta" src="{% static 'audio/bip.mp3' %}" preload="auto"></audio>
+
+    <script>
+        const relogioEl = document.getElementById("relogio");
+        const senhaEl = document.getElementById("senha");
+        const guicheEl = document.getElementById("guiche");
+        const historicoEl = document.getElementById("historico");
+        const somAlerta = document.getElementById("som-alerta");
+    
+        function atualizarRelogio() {
+            const agora = new Date();
+            const hora = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            relogioEl.textContent = hora;
+        }
+    
+        function falarSenha(texto) {
+            const synth = window.speechSynthesis;
+            const utter = new SpeechSynthesisUtterance(texto);
+            utter.lang = 'pt-BR';
+            synth.speak(utter);
+        }
+    
+        let ultimaSenha = "";
+    
+        async function atualizarSenhaPainel() {
+            const response = await fetch("{% url 'ultima_senha_chamada' %}");
+            const dados = await response.json();
+    
+            if (dados.senha && dados.senha !== ultimaSenha) {
+                ultimaSenha = dados.senha;
+    
+                senhaEl.textContent = dados.senha;
+                guicheEl.textContent = dados.guiche;
+    
+                // Toca som de alerta
+                somAlerta.play();
+    
+                // Fala a senha
+                const texto = `Senha ${dados.senha}, guichê ${dados.guiche}`;
+                falarSenha(texto);
+    
+                // Atualizar histórico (pode ser customizado)
+                const novoItem = document.createElement("li");
+                novoItem.textContent = `${dados.senha} - Guichê ${dados.guiche}`;
+                historicoEl.prepend(novoItem);
+    
+                // Limitar histórico a 10 itens
+                while (historicoEl.children.length > 10) {
+                    historicoEl.removeChild(historicoEl.lastChild);
+                }
+            }
+        }
+    
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+    
+        setInterval(atualizarSenhaPainel, 5000); // Atualiza a cada 5 segundos
+    </script>
+</body>
+</html>
