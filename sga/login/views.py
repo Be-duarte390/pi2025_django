@@ -4,26 +4,31 @@ from django.contrib import messages
 from principal.models import Funcionario
 from django.contrib.auth.models import User
 
-# Create your views here.
-def login_funcao(request, funcao):
+
+def login_funcionario(request):
     if request.method == 'POST':
-        cpf = request.POST.get('cpf')
-        senha = request.POST.get('senha')
+        cpf = request.POST['cpf']
+        senha = request.POST['senha']
         try:
             funcionario = Funcionario.objects.get(cpf=cpf)
-            if funcionario.user:
-                user_authenticated = authenticate(request, username=funcionario.user.username, password=senha)
-                if user_authenticated is not None:
-                    if funcionario.funcoes.filter(nome=funcao.lower()).exists():
-                        login(request, user_authenticated)
-                        messages.success(request, 'Login realizado com sucesso.')
-                        return redirect(f'/{funcao.lower()}/')
-                    else:
-                        messages.error(request, 'Você não tem permissão para essa função.')
+            user = authenticate(request, username=funcionario.user.username, password=senha)
+            if user is not None:
+                login(request, user)
+
+                # Redirecionamento por função
+                funcoes = funcionario.funcoes.values_list('nome', flat=True)
+                if 'administrador' in funcoes:
+                    return redirect('pagina_administrador')
+                elif 'recepcionista' in funcoes:
+                    return redirect('pagina_recepcionista')
+                elif 'guiche' in funcoes:
+                    return redirect('pagina_guiche')
                 else:
-                    messages.error(request, 'Senha inválida.')
+                    messages.warning(request, 'Função não reconhecida.')
+                    return redirect('login_funcionario')
             else:
-                messages.error(request, 'Funcionário não vinculado a um usuário válido.')
+                messages.error(request, 'Senha incorreta.')
         except Funcionario.DoesNotExist:
-            messages.error(request, 'Funcionário não encontrado.')
-    return render(request, f'{funcao}/login.html')
+            messages.error(request, 'CPF não encontrado.')
+
+    return render(request, 'login/login.html')

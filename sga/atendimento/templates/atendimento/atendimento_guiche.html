@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block titulo %}Atendimento Guichê{% endblock %}
+
+{% block conteudo %}
+<div class="container">
+    <h2>Guichê {{ guiche }} - Atendimento</h2>
+
+    {% if senha_chamada %}
+        <div class="alert alert-success">
+            <strong>Senha chamada:</strong> {{ senha_chamada.senha_completa }} - {{ senha_chamada.nome_paciente }}
+            <form method="POST" action="">
+                {% csrf_token %}
+                <button type="submit" name="reanunciar" value="{{ senha_chamada.id }}" class="btn btn-warning mt-2">Reanunciar</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <h4 class="mt-4">Fila de Pacientes:</h4>
+    <ul class="list-group">
+        {% for senha in senhas %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ senha.senha_completa }} - {{ senha.nome_paciente }}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="chamar_senha_id" value="{{ senha.id }}">
+                    <button type="submit" class="btn btn-success">Chamar</button>
+                </form>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Nenhuma senha na fila.</li>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-4">
+        <a href="{% url 'pagina_inicial' %}" class="btn btn-secondary">Sair</a>
+    </div>
+</div>
+{% endblock %}

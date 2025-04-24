@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from principal.models import TipoAtendimento
-from atendimento.models import Guiche
+from django.http import JsonResponse
 from django.utils import timezone
+from datetime import datetime
+
+from principal.models import TipoAtendimento, SenhaPaciente
+from atendimento.models import Guiche, SenhaChamada, Atendente
+
 
 @login_required
 def pagina_guiche(request):
@@ -37,21 +41,16 @@ def pagina_guiche(request):
         return redirect('atendimento_guiche', guiche_numero=guiche_numero)
 
     guiches_disponiveis = Guiche.objects.all()
-    from principal.models import SenhaPaciente
     tipos_senha = SenhaPaciente.TIPOS_SENHA
     funcionario = request.user.funcionario
     funcionario_nome = funcionario.nome
 
-    return render(request, 'Guiche/inicio.html', {
+    return render(request, 'atendimento/pagina_inicial_guiche.html', {
         'guiches_disponiveis': guiches_disponiveis,
         'tipos_senha': tipos_senha,
         'funcionario_nome': funcionario_nome,
     })
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from principal.models import SenhaPaciente
-from atendimento.models import Guiche, SenhaChamada, Atendente
 
 @login_required
 def atendimento_guiche(request, guiche_numero):
@@ -79,7 +78,7 @@ def atendimento_guiche(request, guiche_numero):
             senha_id = request.POST['reanunciar']
             senha_chamada = get_object_or_404(SenhaPaciente, id=senha_id)
 
-    return render(request, 'Guiche/atendimento.html', {
+    return render(request, 'atendimento/atendimento_guiche.html', {
         'guiche': guiche,
         'senhas': senhas,
         'senha_chamada': senha_chamada,

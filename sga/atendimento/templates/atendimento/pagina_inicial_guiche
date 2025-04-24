@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block titulo %}Painel do Guichê{% endblock %}
+
+{% block conteudo %}
+<div class="container">
+    <h2>Bem-vindo, {{ funcionario_nome }}!</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+    
+        <!-- Campo Número do Guichê centralizado -->
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <label for="numero_guiche" class="form-label text-center w-100">Número do Guichê:</label>
+                <select name="numero_guiche" id="numero_guiche" class="form-control form-control-sm text-center" required>
+                    <option value="">Selecione</option>
+                    {% for guiche in guiches_disponiveis %}
+                        <option value="{{ guiche.numero }}">{{ guiche.numero }}</option>
+                    {% empty %}
+                        <option disabled>Não há guichês disponíveis.</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    
+        <!-- Tipos de Senha e Proporção justificados -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <label class="form-label">Tipos de Senha que irá atender (com proporção):</label>
+                <div class="row">
+                    {% for tipo, nome in tipos_senha %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tipos_atendimento" value="{{ tipo }}" id="tipo_{{ tipo }}">
+                                <label class="form-check-label" for="tipo_{{ tipo }}">
+                                    {{ tipo }} - {{ nome }}
+                                </label>
+                                <input type="number" name="proporcao_{{ tipo }}" min="1" class="form-control form-control-sm mt-1" placeholder="Proporção">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    
+        <!-- Botão -->
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary btn-sm">Iniciar Atendimento</button>
+            </div>
+        </div>
+    
+        <!-- Mensagens -->
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+    
+</div>
+{% endblock %}

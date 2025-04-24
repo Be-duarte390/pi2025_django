@@ -1,0 +1,118 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block titulo %}Página de Recepção - SGA{% endblock %}
+
+{% block conteudo %}
+<div class="pagina-recepcao flex justify-center">
+    <div class="p-6 w-full max-w-4xl">
+        <!-- Logo do Sistema -->
+        <div class="flex justify-center mb-6">
+            <img src="{% static 'Imagens/logo.png' %}" class="logo" alt="Logo do Instituto">
+        </div>
+
+        <!-- Boas-vindas -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-semibold">Bem-vindo, {{ request.user.first_name }}!</h1>
+            <p class="text-lg text-gray-600">Você está logado no sistema como <strong>Recepcionista</strong>.</p>
+        </div>
+
+        <!-- Confirmar Agendamento -->
+        <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Confirmar Agendamento</h3>
+            <form method="POST" action="{% url 'confirmar_agendamento' %}" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Linha com Nome do Paciente, Hora Agendada e Profissional de Saúde -->
+                <div class="flex justify-between gap-6 flex-wrap mb-4">
+                    <!-- Nome do Paciente à esquerda -->
+                    <div class="w-full md:w-1/3">
+                        <label for="nome_paciente" class="block font-medium text-gray-700">Nome do Paciente:</label>
+                        <input type="text" name="nome_paciente" id="nome_paciente" required
+                            class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Digite o nome do paciente">
+                    </div>
+
+                    <!-- Hora Agendada no centro -->
+                    <div class="w-full md:w-1/3">
+                        <label for="hora_agendada" class="block font-medium text-gray-700">Horário Agendado:</label>
+                        <input type="time" name="hora_agendada" id="hora_agendada" required
+                            class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Profissional de Saúde à direita -->
+                    <div class="w-full md:w-1/3">
+                        <label for="profissional" class="block font-medium text-gray-700">Profissional de Saúde:</label>
+                        <select name="profissional" id="profissional">
+                            {% for profissional in profissionais %}
+                                <option value="{{ profissional.id }}">{{ profissional.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tipo de Senha -->
+                <div>
+                    <label for="tipo_senha" class="block font-medium text-gray-700">Tipo de Senha:</label>
+                    <select name="tipo_senha" id="tipo_senha" required
+                        class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        {% for tipo, nome in tipo_senhas %}
+                            <option value="{{ tipo }}">{{ nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- Para depuração, mostre as opções -->
+                        <p>Tipo de senha: {{ tipo_senhas }}</p>
+                </div>
+
+                <!-- Campo Observação -->
+                <div>
+                    <label for="observacao" class="block font-medium text-gray-700">Observação:</label>
+                    <textarea name="observacao" id="observacao" rows="4"
+                              class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Observações sobre o atendimento"></textarea>
+                </div>
+
+                <!-- Botão "Confirmar Agendamento" -->
+                <button type="submit" class="botao-confirmar">
+                    Confirmar Agendamento
+                </button>
+            </form>
+        </div>
+
+        {% if senha %}
+            <div class="print-only">
+                <div class="ticket mx-auto">
+                    <h1>{{ senha.senha_completa }}</h1>
+                    <small><strong>Nome:</strong> {{ senha.nome }}</small><br>
+                    <small><strong>Profissional:</strong> {{ senha.profissional.funcionario.nome }}</small><br>
+                    <small><strong>Horário:</strong> {{ senha.data_emissao|time:"H:i" }}</small><br>
+                    <small><strong>Data:</strong> {{ senha.data_emissao|date:"d/m/Y" }}</small><br>
+                    {% if senha.observacao %}
+                        <small><strong>Obs.:</strong> {{ senha.observacao }}</small>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Também exibe na tela com estilo bonito -->
+            <div class="bg-white border border-gray-300 text-gray-800 p-6 rounded-lg shadow-md mt-6">
+                <h3 class="text-2xl font-semibold mb-4 text-center">Senha Gerada</h3>
+                <div class="text-lg leading-8">
+                    <p><strong>Senha:</strong> <span class="text-2xl font-bold">{{ senha.senha_completa }}</span></p>
+                    <p><strong>Paciente:</strong> {{ senha.nome }}</p>
+                    <p><strong>Profissional:</strong> {{ senha.profissional.funcionario.nome }}</p>
+                    <p><strong>Horário:</strong> {{ senha.data_emissao|time:"H:i" }}</p>
+                    <p><strong>Data:</strong> {{ senha.data_emissao|date:"d/m/Y" }}</p>
+                    {% if senha.observacao %}
+                        <p><strong>Observação:</strong> {{ senha.observacao }}</p>
+                    {% endif %}
+                </div>
+
+                <button onclick="window.print()" class="mt-6 w-full bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-300 ease-in-out shadow-lg">
+                    Imprimir Senha
+                </button>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

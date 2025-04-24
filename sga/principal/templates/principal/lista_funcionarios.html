@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+{% block titulo %}Funcionários Cadastrados{% endblock %}
+{% load static %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <h2 class="mb-4">Lista de Funcionários</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Funções</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in funcionarios %}
+                    <tr>
+                        <td>{{ f.user.first_name }}</td>
+                        <td>{{ f.cpf }}</td>
+                        <td>{{ f.user.email }}</td>
+                        <td>
+                            {% for funcao in f.funcoes.all %}
+                                <span class="badge bg-secondary">{{ funcao.nome|capfirst }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center">Nenhum funcionário cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

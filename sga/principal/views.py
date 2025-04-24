@@ -1,14 +1,23 @@
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Funcionario, Profissional, Paciente, TipoAtendimento, SenhaPaciente
+from login.models import RegistroLogin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
-from .models import Funcionario, Profissional, Paciente, TipoAtendimento, SenhaPaciente
-from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import CadastroFuncionarioForm
 
+# VIEWS REFERENTES AO ADMIN
 def is_admin(user):
     return user.is_superuser or user.funcionario.funcoes.filter(nome='administrador').exists()
 
+#Painel inicial - Admin
+@login_required
+@user_passes_test(lambda user: user.funcionario.funcoes.filter(nome='administrador').exists())
+def pagina_administrador(request):
+    return render(request, 'principal/pagina_administrador.html')
+
+#Cadastro de Funcionários - Admin
 @login_required
 @user_passes_test(is_admin)
 def cadastrar_funcionario(request):
@@ -26,19 +35,36 @@ def cadastrar_funcionario(request):
     else:
         form = CadastroFuncionarioForm()
 
-    return render(request, 'Administrador/cadastro_funcionario.html', {
+    return render(request, 'principal/cadastro_funcionario.html', {
         'form': form,
         'cadastro_realizado': cadastro_realizado
     })
 
+#Exibição da lista de funcionários - Admin
 @login_required
 @user_passes_test(is_admin)
-def pagina_administrador(request):
-    return render(request, 'Administrador/pagina_administrador.html')
+def lista_funcionarios(request):
+    funcionarios = Funcionario.objects.select_related('user').prefetch_related('funcoes').all()
+    return render(request, 'principal/lista_funcionarios.html', {
+        'funcionarios': funcionarios
+    })
+
+#Relatório de logins - Admin
+@login_required
+@user_passes_test(is_admin)
+def relatorio_logins(request):
+    logins = RegistroLogin.objects.select_related('usuario').order_by('-horario_login')
+    return render(request, 'principal/relatorio_logins.html', {
+        'logins': logins
+    })
+
+
 
 def pagina_inicial(request):
     return render(request, 'principal/inicio.html')
 
+# VIEWS REFERENTES AO RECEPCIONISTA
+#Painel inicial - Recepcionista
 @login_required
 def pagina_recepcao(request):
     profissionais = Funcionario.objects.filter(funcoes__nome='profissional_saude').select_related('user')
@@ -47,7 +73,7 @@ def pagina_recepcao(request):
     if request.method == 'POST':
         return gerar_senha(request)
 
-    return render(request, 'principal/inicio.html', {
+    return render(request, 'principal/pagina_inicial_recepcao.html', {
         'profissionais': profissionais,
         'tipo_senhas': tipo_senhas,
     })
