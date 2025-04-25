@@ -4,7 +4,7 @@
 {% block titulo %}Painel do Administrador - SGA{% endblock %}
 
 {% block conteudo %}
-    <img src="{% static 'Imagens/logo.png' %}" class="logo" alt="Logo do Instituto">
+    <img src="{% static 'image/logo.png' %}" alt="Logo do Instituto">
     <h1>Bem-vindo, {{ request.user }}!</h1>
     <div>
         <a href="{% url 'cadastrar_funcionario' %}" class="botao-funcao">Cadastrar Funcionário</a>

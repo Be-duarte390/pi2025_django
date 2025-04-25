@@ -1,8 +1,16 @@
 {% extends "layout.html" %}
+{% load static %}
+
 {% block titulo %}Login - SGA{% endblock %}
 {% block conteudo %}
+<!-- Boas-vindas -->
+<!--<div class="text-center mb-6"> -->
+    
 <div class="container mt-5">
-    <h2 class="mb-4">Login do Sistema</h2>
+    <img src="{% static 'image/logo.png' %}" alt="Logo do Instituto">
+    <!-- Boas-vindas -->
+    <h1 class="text-3xl font-semibold">Bem-vindo ao SGA! </h1>
+    <p class="text-lg text-gray-600">Faça o login para continuar.</p>
     <form method="POST">
         {% csrf_token %}
         <div class="mb-3">

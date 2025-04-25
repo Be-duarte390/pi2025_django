@@ -1,16 +1,12 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>{% block titulo %}SGA{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <style>
-        /* Estrutura da página */
         body {
             display: flex;
             flex-direction: column;
@@ -23,6 +19,23 @@
         main {
             flex: 1;
             padding: 20px;
+        }
+
+        .navbar-custom {
+            background-color: #003366;
+            color: white;
+            min-height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            font-size: 18px;
+        }
+
+        .btn-logout {
+            padding: 6px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         footer {
@@ -67,6 +80,21 @@
     </style>
 </head>
 <body>
+    {% if request.user.is_authenticated %}
+    <nav class="navbar-custom">
+        <div>
+            {% with request.user.funcionario as funcionario %}
+                <span class="fw-semibold">Usuário Logado:</span>
+                {{ funcionario.nome }}
+                ({{ request.session.funcao_ativa|title }})
+            {% endwith %}
+        </div>
+        <div>
+            <a href="{% url 'logout' %}" class="btn btn-danger btn-logout">Logout</a>
+        </div>
+    </nav>
+    {% endif %}
+    
     <main>
         {% block conteudo %}
         {% endblock %}
@@ -84,8 +112,5 @@
     <footer>
         &copy; 2025 Instituto Lauro de Souza Lima. Todos os direitos reservados.
     </footer>
-
 </body>
 </html>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
