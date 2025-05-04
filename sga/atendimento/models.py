@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Guiche(models.Model):
     numero = models.PositiveSmallIntegerField(unique=True)
-    tipos_atendimento = models.ManyToManyField('principal.TipoAtendimento', blank=True)
+    tipos_atendimento = models.ManyToManyField('principal.TipoAtendimento', related_name='guiches', blank=True)
     # Outros campos...
 
     def __str__(self):
@@ -31,8 +31,9 @@ class SenhaChamada(models.Model):
     
 class Atendente(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    nome = models.CharField(max_length=100)
     guiche = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.nome
+        return self.usuario.get_full_name() or self.usuario.username
+    
+    

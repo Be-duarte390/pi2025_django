@@ -76,8 +76,9 @@ class Paciente(models.Model):
         return self.nome
     
 class TipoAtendimento(models.Model):
-    codigo = models.CharField(max_length=10)
-    # Outros campos...
+    codigo = models.CharField(max_length=10, primary_key=True)
+    nome = models.CharField(max_length=100)  
+    guiche = models.ManyToManyField('atendimento.Guiche', related_name='tipos_atendimento_principal')
 
     def __str__(self):
-        return f'{self.codigo}'
+        return f"{self.codigo} - {self.nome}"

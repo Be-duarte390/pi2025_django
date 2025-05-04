@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
-from .forms import CadastroFuncionarioForm
+from .forms import CadastroFuncionarioForm, GuicheForm
 
 # VIEWS REFERENTES AO ADMIN
 def is_admin(user):
@@ -58,6 +58,18 @@ def relatorio_logins(request):
         'logins': logins
     })
 
+#Cadastro de Guiches
+@login_required
+@user_passes_test(is_admin)
+def cadastrar_guiche(request):
+    if request.method == 'POST':
+        form = GuicheForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('pagina_administrador')
+    else:
+        form = GuicheForm()
+    return render(request, 'principal/cadastrar_guiche.html', {'form': form})
 
 
 def pagina_inicial(request):

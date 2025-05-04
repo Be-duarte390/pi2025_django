@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from .models import Funcionario, Funcao
+from atendimento.models import Guiche
 
 class CadastroFuncionarioForm(forms.ModelForm):
     nome = forms.CharField(label='Nome', max_length=100)
@@ -54,3 +55,14 @@ class CadastroFuncionarioForm(forms.ModelForm):
             funcionario.funcoes.set(self.cleaned_data['funcoes'])
 
         return funcionario
+
+class GuicheForm(forms.ModelForm):
+    class Meta:
+        model = Guiche
+        fields = ['numero']
+        widgets = {
+            'numero': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número do guichê'}),
+        }
+        labels = {
+            'numero': 'Número do Guichê'
+        }
